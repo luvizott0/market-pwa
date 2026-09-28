@@ -45,6 +45,7 @@ export interface InventoryItem {
   status: InventoryItemStatus
   days_until_expiration?: number | null
   estimated_monthly_cost?: number | null
+  store_name?: string | null
   purchases?: InventoryPurchase[]
   created_at?: string
   updated_at?: string

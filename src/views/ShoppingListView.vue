@@ -45,6 +45,9 @@ onMounted(async () => {
   if (inventoryStore.items.length === 0) {
     await inventoryStore.fetchItems()
   }
+  if (inventoryStore.categories.length === 0) {
+    await inventoryStore.fetchCategories()
+  }
 })
 
 // Search results for adding from inventory
@@ -152,96 +155,85 @@ const onShoppingFinished = (result: any) => {
       </button>
     </div>
 
-    <!-- Top Supermarket Fast Search Bar -->
-    <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            <span>Lista de Compras</span>
-            <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
-              {{ shoppingStore.pendingCount }} a comprar
-            </span>
-          </h1>
-          <p class="text-xs text-slate-500 font-medium">
-            Pesquise itens para colocar no carrinho ou adicione avulsos
-          </p>
+    <!-- Top Fast Search & Add Avulso Bar -->
+    <div class="bg-white p-3.5 sm:p-4 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
+      <div class="flex items-center gap-2.5">
+        <!-- Search Input with Auto-complete -->
+        <div class="relative flex-1">
+          <Search class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Pesquisar produto no estoque para comprar..."
+            class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs text-slate-900 placeholder:text-slate-400 transition"
+          />
+          <button
+            v-if="searchQuery"
+            type="button"
+            @click="searchQuery = ''"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+          >
+            <X class="w-3.5 h-3.5" />
+          </button>
+
+          <!-- Dropdown search suggestions -->
+          <div
+            v-if="searchQuery && searchResults.length > 0"
+            class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-slate-200/90 z-40 max-h-64 overflow-y-auto divide-y divide-slate-100 animate-in fade-in zoom-in-98 duration-100"
+          >
+            <div
+              v-for="item in searchResults"
+              :key="item.id"
+              @click="handleAddFromSearch(item)"
+              class="p-3 hover:bg-emerald-50/50 flex items-center justify-between cursor-pointer transition"
+            >
+              <div class="min-w-0 pr-2">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-xs text-slate-900 truncate">{{ item.name }}</span>
+                  <span v-if="item.brand" class="text-[11px] text-slate-400">({{ item.brand }})</span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
+                  <span>Estoque: {{ item.quantity }} {{ item.unit }}</span>
+                  <span>•</span>
+                  <span>Ref: {{ formatCurrency(item.last_price || item.average_price) }}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="px-2.5 py-1 bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-2xs shrink-0"
+              >
+                <Plus class="w-3.5 h-3.5" />
+                <span>Adicionar</span>
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-else-if="searchQuery && searchResults.length === 0"
+            class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-slate-200/90 z-40 p-4 text-center space-y-2 animate-in fade-in"
+          >
+            <p class="text-xs text-slate-500">Nenhum produto cadastrado com "{{ searchQuery }}".</p>
+            <button
+              type="button"
+              @click="handleAddCustomPrompt"
+              class="px-3.5 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer"
+            >
+              <Plus class="w-3.5 h-3.5" />
+              <span>Adicionar "{{ searchQuery }}" como item avulso</span>
+            </button>
+          </div>
         </div>
 
         <button
           type="button"
           @click="handleAddCustomPrompt"
-          class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0"
+          class="px-3.5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0 shadow-xs shadow-emerald-600/20"
         >
           <Plus class="w-4 h-4" />
-          <span>Item Avulso</span>
+          <span class="hidden sm:inline">Adicionar Item Avulso</span>
+          <span class="sm:hidden">Item Avulso</span>
         </button>
-      </div>
-
-      <!-- Search Input with Auto-complete -->
-      <div class="relative">
-        <Search class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="Pesquisar produto no estoque para comprar..."
-          class="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-xs text-slate-900 placeholder:text-slate-400 transition"
-        />
-        <button
-          v-if="searchQuery"
-          type="button"
-          @click="searchQuery = ''"
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
-        >
-          <X class="w-3.5 h-3.5" />
-        </button>
-
-        <!-- Dropdown search suggestions -->
-        <div
-          v-if="searchQuery && searchResults.length > 0"
-          class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-slate-200/90 z-40 max-h-64 overflow-y-auto divide-y divide-slate-100 animate-in fade-in zoom-in-98 duration-100"
-        >
-          <div
-            v-for="item in searchResults"
-            :key="item.id"
-            @click="handleAddFromSearch(item)"
-            class="p-3 hover:bg-emerald-50/50 flex items-center justify-between cursor-pointer transition"
-          >
-            <div class="min-w-0 pr-2">
-              <div class="flex items-center gap-2">
-                <span class="font-bold text-xs text-slate-900 truncate">{{ item.name }}</span>
-                <span v-if="item.brand" class="text-[11px] text-slate-400">({{ item.brand }})</span>
-              </div>
-              <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
-                <span>Estoque: {{ item.quantity }} {{ item.unit }}</span>
-                <span>•</span>
-                <span>Ref: {{ formatCurrency(item.last_price || item.average_price) }}</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              class="px-2.5 py-1 bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-2xs shrink-0"
-            >
-              <Plus class="w-3.5 h-3.5" />
-              <span>Adicionar</span>
-            </button>
-          </div>
-        </div>
-
-        <div
-          v-else-if="searchQuery && searchResults.length === 0"
-          class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-xl border border-slate-200/90 z-40 p-4 text-center space-y-2 animate-in fade-in"
-        >
-          <p class="text-xs text-slate-500">Nenhum produto cadastrado com "{{ searchQuery }}".</p>
-          <button
-            type="button"
-            @click="handleAddCustomPrompt"
-            class="px-3.5 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer"
-          >
-            <Plus class="w-3.5 h-3.5" />
-            <span>Adicionar "{{ searchQuery }}" como item avulso</span>
-          </button>
-        </div>
       </div>
 
       <!-- Suggested Items Row (Estoque Baixo ou Esgotado) -->
@@ -668,6 +660,7 @@ const onShoppingFinished = (result: any) => {
     <!-- Modals -->
     <QuickAddCustomModal
       :is-open="isCustomModalOpen"
+      :categories="inventoryStore.categories"
       @close="isCustomModalOpen = false"
     />
 
