@@ -48,8 +48,32 @@ const inviteUrl = computed(() => {
   return `${window.location.origin}/invite/${generatedInviteToken.value}`
 })
 
+const dropdownOffsetStyle = ref<Record<string, string>>({})
+
+const updatePosition = () => {
+  if (!dropdownRef.value || typeof window === 'undefined') return
+  const rect = dropdownRef.value.getBoundingClientRect()
+  const screenWidth = window.innerWidth
+
+  if (screenWidth < 640) {
+    const distFromRight = screenWidth - rect.right
+    const targetMargin = 12
+    const rightShift = Math.max(0, distFromRight - targetMargin)
+
+    dropdownOffsetStyle.value = {
+      right: `-${rightShift}px`,
+      width: `${Math.min(290, screenWidth - 24)}px`,
+    }
+  } else {
+    dropdownOffsetStyle.value = {}
+  }
+}
+
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value
+  if (isOpen.value) {
+    updatePosition()
+  }
 }
 
 const closeDropdown = () => {
@@ -64,10 +88,12 @@ const handleClickOutside = (e: MouseEvent) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  window.addEventListener('resize', updatePosition)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('resize', updatePosition)
 })
 
 const handleSelectSpace = (ws: Workspace) => {
@@ -194,25 +220,26 @@ const handleSendEmailInvite = async () => {
       <ChevronDown class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': isOpen }" />
     </button>
 
-    <!-- Dropdown Menu -->
+    <!-- Dropdown Menu: anchored directly below button, dynamically contained on mobile -->
     <div
       v-if="isOpen"
-      class="absolute left-0 sm:right-0 sm:left-auto top-full mt-2 w-72 sm:w-80 bg-white rounded-3xl shadow-2xl border border-slate-200/90 z-50 p-3 space-y-2 animate-in fade-in zoom-in-95 duration-150"
+      :style="dropdownOffsetStyle"
+      class="absolute top-full mt-2 z-50 sm:right-0 w-72 sm:w-80 bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-3 space-y-2 animate-in fade-in zoom-in-95 duration-150"
     >
       <!-- Dropdown Header -->
       <div class="px-2 py-1 flex items-center justify-between border-b border-slate-100 pb-2">
         <div>
           <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Alternar Espaço</span>
-          <p class="text-xs font-bold text-slate-700">Seus Espaços ({{ spacesCount }}/3)</p>
+          <p class="text-xs font-bold text-slate-800">Seus Espaços ({{ spacesCount }}/3)</p>
         </div>
         <button
           v-if="canCreate"
           type="button"
           @click="openCreateModal"
-          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer hover:bg-emerald-50 px-2 py-1 rounded-xl transition"
+          class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer hover:bg-emerald-50 px-2.5 py-1 rounded-xl transition"
         >
           <Plus class="w-3.5 h-3.5" />
-          <span>Novo</span>
+          <span>Novo Espaço</span>
         </button>
       </div>
 
