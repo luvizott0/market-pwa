@@ -288,13 +288,10 @@ export const useShoppingListStore = defineStore('market_shopping_list', () => {
     }
   }
 
-  // Real-time synchronization
-  const startPolling = (intervalMs: number = 4000) => {
+  // Synchronization helpers (polling disabled in favor of manual refresh until websocket is added)
+  const startPolling = (_intervalMs: number = 4000) => {
     stopPolling()
-    fetchItems(false)
-    pollIntervalId = setInterval(() => {
-      fetchItems(true)
-    }, intervalMs)
+    // No automatic interval
   }
 
   const stopPolling = () => {
@@ -308,9 +305,6 @@ export const useShoppingListStore = defineStore('market_shopping_list', () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('market:space-changed', () => {
       fetchItems(false)
-    })
-    window.addEventListener('focus', () => {
-      fetchItems(true)
     })
   }
 

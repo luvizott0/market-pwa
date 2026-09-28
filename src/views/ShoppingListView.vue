@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   ShoppingCart,
   Search,
@@ -13,13 +13,13 @@ import {
   ShoppingBag,
   AlertTriangle,
   RotateCcw,
+  RotateCw,
   Edit2,
   Tag,
   DollarSign,
   Package,
   Pencil,
   ArrowRight,
-  Radio,
 } from 'lucide-vue-next'
 import { useShoppingListStore } from '@/stores/shoppingList'
 import { useInventoryStore } from '@/stores/inventory'
@@ -43,7 +43,7 @@ const isPriceModalOpen = ref(false)
 const modalPriceInput = ref<number | null>(null)
 
 onMounted(async () => {
-  shoppingStore.startPolling()
+  await shoppingStore.fetchItems()
   if (inventoryStore.items.length === 0) {
     await inventoryStore.fetchItems()
   }
@@ -52,9 +52,9 @@ onMounted(async () => {
   }
 })
 
-onUnmounted(() => {
-  shoppingStore.stopPolling()
-})
+const handleRefresh = async () => {
+  await shoppingStore.fetchItems()
+}
 
 // Search results for adding from inventory
 const searchResults = computed(() => {
@@ -242,18 +242,25 @@ const onShoppingFinished = (result: any) => {
         </button>
       </div>
 
-      <!-- Real-time sync indicator -->
-      <div class="flex items-center justify-between text-[11px] px-1 text-slate-400">
-        <div class="flex items-center gap-1.5">
-          <span
-            class="w-2 h-2 rounded-full shrink-0"
-            :class="shoppingStore.isSyncing ? 'bg-amber-500 animate-ping' : 'bg-emerald-500 animate-pulse'"
-          ></span>
-          <span class="font-medium text-slate-500">
-            {{ shoppingStore.isSyncing ? 'Sincronizando...' : 'Sincronizado na nuvem em tempo real' }}
+      <!-- Manual refresh & items counter -->
+      <div class="flex items-center justify-between text-[11px] px-1 text-slate-500">
+        <button
+          type="button"
+          @click="handleRefresh"
+          :disabled="shoppingStore.isLoading"
+          class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-600 hover:text-emerald-700 active:scale-95 transition cursor-pointer disabled:opacity-50 shadow-2xs"
+          title="Atualizar lista de compras"
+        >
+          <RotateCw
+            class="w-3.5 h-3.5 text-emerald-600 shrink-0"
+            :class="{ 'animate-spin': shoppingStore.isLoading }"
+          />
+          <span class="font-medium text-[11px]">
+            {{ shoppingStore.isLoading ? 'Atualizando...' : 'Atualizar lista' }}
           </span>
-        </div>
-        <span class="font-bold text-slate-600">
+        </button>
+
+        <span class="font-bold text-slate-600 text-[11px]">
           {{ shoppingStore.pendingCount }} {{ shoppingStore.pendingCount === 1 ? 'item a comprar' : 'itens a comprar' }}
         </span>
       </div>
