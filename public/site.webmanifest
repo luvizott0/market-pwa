@@ -1,21 +1,38 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Market PWA - Estoque & Compras",
+  "short_name": "Market",
+  "description": "Gerenciador de despensa, estoque residencial e lista de compras inteligente",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
     },
     {
       "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable_icon.png",
+      "sizes": "2048x2048",
+      "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  "theme_color": "#10b981",
+  "background_color": "#f8fafc",
+  "display": "standalone",
+  "orientation": "portrait"
 }
