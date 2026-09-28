@@ -32,7 +32,7 @@ const handleRefresh = async () => {
 </script>
 
 <template>
-  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3 sm:px-6 flex items-center justify-between">
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 pt-safe-header pb-3 sm:px-6 flex items-center justify-between">
     <!-- Mobile brand icon & Title -->
     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
       <div class="lg:hidden w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-xs shrink-0">

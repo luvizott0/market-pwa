@@ -26,9 +26,24 @@
 }
 
 /* iOS Safe Area Utilities */
-.pb-safe {
-  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
 }
+
 .pt-safe {
-  padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-top: 0.75rem;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+}
+
+.pt-safe-header {
+  padding-top: 0.75rem;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem);
+}
+
+.pb-safe {
+  padding-bottom: 0.75rem;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.6rem);
 }

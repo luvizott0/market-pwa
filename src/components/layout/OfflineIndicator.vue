@@ -8,7 +8,7 @@ const { isOnline } = useNetworkStatus()
 <template>
   <div
     v-if="!isOnline"
-    class="bg-amber-500 text-white px-4 py-2 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all duration-300 z-50 sticky top-0"
+    class="bg-amber-500 text-white px-4 pt-safe-header pb-2 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all duration-300 z-50 sticky top-0"
   >
     <WifiOff class="w-4 h-4 animate-pulse" />
     <span>Você está offline. As alterações locais estão seguras e serão sincronizadas quando reconectar.</span>
