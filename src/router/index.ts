@@ -40,6 +40,12 @@ const router = createRouter({
       component: SettingsView,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/invite/:token',
+      name: 'invite',
+      component: () => import('../views/InviteView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 })
 

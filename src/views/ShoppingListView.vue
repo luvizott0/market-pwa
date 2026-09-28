@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import {
   ShoppingCart,
   Search,
@@ -19,6 +19,7 @@ import {
   Package,
   Pencil,
   ArrowRight,
+  Radio,
 } from 'lucide-vue-next'
 import { useShoppingListStore } from '@/stores/shoppingList'
 import { useInventoryStore } from '@/stores/inventory'
@@ -42,12 +43,17 @@ const isPriceModalOpen = ref(false)
 const modalPriceInput = ref<number | null>(null)
 
 onMounted(async () => {
+  shoppingStore.startPolling()
   if (inventoryStore.items.length === 0) {
     await inventoryStore.fetchItems()
   }
   if (inventoryStore.categories.length === 0) {
     await inventoryStore.fetchCategories()
   }
+})
+
+onUnmounted(() => {
+  shoppingStore.stopPolling()
 })
 
 // Search results for adding from inventory
@@ -234,6 +240,22 @@ const onShoppingFinished = (result: any) => {
           <span class="hidden sm:inline">Adicionar Item Avulso</span>
           <span class="sm:hidden">Item Avulso</span>
         </button>
+      </div>
+
+      <!-- Real-time sync indicator -->
+      <div class="flex items-center justify-between text-[11px] px-1 text-slate-400">
+        <div class="flex items-center gap-1.5">
+          <span
+            class="w-2 h-2 rounded-full shrink-0"
+            :class="shoppingStore.isSyncing ? 'bg-amber-500 animate-ping' : 'bg-emerald-500 animate-pulse'"
+          ></span>
+          <span class="font-medium text-slate-500">
+            {{ shoppingStore.isSyncing ? 'Sincronizando...' : 'Sincronizado na nuvem em tempo real' }}
+          </span>
+        </div>
+        <span class="font-bold text-slate-600">
+          {{ shoppingStore.pendingCount }} {{ shoppingStore.pendingCount === 1 ? 'item a comprar' : 'itens a comprar' }}
+        </span>
       </div>
 
       <!-- Suggested Items Row (Estoque Baixo ou Esgotado) -->

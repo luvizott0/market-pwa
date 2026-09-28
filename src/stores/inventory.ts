@@ -300,6 +300,12 @@ export const useInventoryStore = defineStore('market_inventory', () => {
     return res
   }
 
+  if (typeof window !== 'undefined') {
+    window.addEventListener('market:space-changed', () => {
+      refreshAll()
+    })
+  }
+
   return {
     items,
     categories,

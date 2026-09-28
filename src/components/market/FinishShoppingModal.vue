@@ -77,7 +77,7 @@ const handleConfirm = async () => {
   errorMessage.value = null
   try {
     const finalStore = storeName.value.trim() || storeSearch.value.trim() || null
-    const result = await shoppingStore.finishShopping(updateStock.value, finalStore)
+    const result = await shoppingStore.finishShopping(finalStore)
     emit('finished', result)
     emit('close')
   } catch (err: any) {

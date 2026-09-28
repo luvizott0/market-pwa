@@ -3,6 +3,7 @@ import { LayoutGrid, Package, ShoppingCart, Settings, LogOut, Store } from 'luci
 import { RouterLink, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useShoppingListStore } from '@/stores/shoppingList'
+import SpaceSwitcher from '@/components/layout/SpaceSwitcher.vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -36,18 +37,10 @@ const handleLogout = async () => {
       </div>
     </div>
 
-    <!-- Workspace Info Card -->
-    <div
-      v-if="authStore.workspaces.length > 0"
-      class="mb-6 p-3 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between"
-    >
-      <div class="min-w-0 pr-2">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Workspace Ativo</span>
-        <p class="text-xs font-bold text-slate-800 truncate">
-          {{ authStore.workspaces.find(w => String(w.id) === authStore.activeWorkspaceId)?.name || 'Residencial' }}
-        </p>
-      </div>
-      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 shrink-0"></span>
+    <!-- Space Selector Card -->
+    <div class="mb-6 flex flex-col space-y-1.5 px-1">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Espaço Ativo</span>
+      <SpaceSwitcher />
     </div>
 
     <!-- Navigation Items -->

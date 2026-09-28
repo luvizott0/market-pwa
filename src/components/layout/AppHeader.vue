@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Settings, RefreshCw, Store } from 'lucide-vue-next'
 import { useInventoryStore } from '@/stores/inventory'
 import { useAuthStore } from '@/stores/auth'
+import SpaceSwitcher from '@/components/layout/SpaceSwitcher.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -33,22 +34,21 @@ const handleRefresh = async () => {
 <template>
   <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 py-3 sm:px-6 flex items-center justify-between">
     <!-- Mobile brand icon & Title -->
-    <div class="flex items-center gap-3">
-      <div class="lg:hidden w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-xs">
+    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+      <div class="lg:hidden w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-xs shrink-0">
         <Store class="w-4 h-4" />
       </div>
-      <div>
-        <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight leading-tight">
+      <div class="min-w-0">
+        <h2 class="text-sm sm:text-base lg:text-lg font-extrabold text-slate-900 tracking-tight leading-tight truncate">
           {{ pageTitle }}
         </h2>
-        <p class="hidden sm:block text-[11px] font-medium text-slate-500">
-          {{ authStore.workspaces.find(w => String(w.id) === authStore.activeWorkspaceId)?.name || 'Controle Residencial' }}
-        </p>
       </div>
     </div>
 
-    <!-- Right Actions -->
-    <div class="flex items-center gap-2">
+    <!-- Right Actions with SpaceSwitcher -->
+    <div class="flex items-center gap-2 shrink-0">
+      <SpaceSwitcher />
+
       <button
         type="button"
         @click="handleRefresh"

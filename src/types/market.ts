@@ -1,6 +1,7 @@
 export interface ShoppingItem {
-  id: string
-  inventory_item_id?: number
+  id: number | string
+  workspace_id?: number
+  inventory_item_id?: number | null
   is_custom_item?: boolean
   stock_category_id?: number | null
   name: string
@@ -15,7 +16,9 @@ export interface ShoppingItem {
   expiration_date?: string | null
   is_checked: boolean
   notes?: string | null
-  added_at: string
+  added_at?: string
+  created_at?: string
+  updated_at?: string
 }
 
 export interface ShoppingTripSummary {
